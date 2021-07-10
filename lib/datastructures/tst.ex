@@ -7,6 +7,17 @@ defmodule TST do
 
   defstruct middle: nil, right: nil, left: nil, value: nil, item: nil
 
+  @doc """
+  Creates an empty ternary search trie data structure
+
+  Returns `%TST{}`
+
+  ## Examples
+  ```
+    iex> TST.new()
+    %TST{item: nil, left: nil, middle: nil, right: nil, value: nil}
+  ```
+  """
   @spec new() :: %TST{}
   def new(), do: %TST{}
 
@@ -22,6 +33,31 @@ defmodule TST do
   @doc """
   Insert a key-value pair into a TST. It is acceptable to pass nil as the first argument - a new TST
   will then be created.
+
+
+  ## Parameters
+
+  - tst: A Ternary Search Trie map or nil (no tree yet created)
+  - key: A String key in which to associate a value with
+  - value: The value that you want to have stored. Can be of any type
+
+  ## Examples
+  ```
+  iex> TST.new() |> TST.insert("key", "value")
+  %TST{
+  item: nil,
+  left: nil,
+  middle: %TST{
+    item: nil,
+    left: nil,
+    middle: %TST{item: "value", left: nil, middle: nil, right: nil, value: "y"},
+    right: nil,
+    value: "e"
+  },
+  right: nil,
+  value: "k"
+  }
+  ```
   """
   @spec insert(%TST{}, String.t(), any) :: %TST{}
   def insert(tst, key, value) when is_nil(tst) do
@@ -76,6 +112,20 @@ defmodule TST do
 
   @doc """
   Query the TST to see if a key is a valid key
+
+  ## Parameters
+
+  - tst: The Ternary Search Trie if you have saved one, or nil (although this doesn't make much sense to look for valid keys in)
+  - key: The key which you are querying whether is valid or not
+
+  ## Examples
+  ```
+  iex> TST.new() |> TST.insert("key", "value") |> TST.exists?("key")
+  true
+
+  iex> TST.new() |> TST.insert("key", "value") |> TST.exists?("a whole other key")
+  false
+  ```
   """
   @spec exists?(nil | %TST{}, String.t()) :: boolean()
   def exists?(tst, _) when is_nil(tst), do: false
@@ -120,11 +170,6 @@ defmodule TST do
   # Here comes helper functions
   ####################################################################################################
 
-  @doc """
-  Makes a judgement based on the comparison of two codepoints to
-  signal an insertion function to either insert a key towards to left subtree
-  or the right subtree
-  """
   defp insert_direction?(tree_value, first_char) do
     codepoint_pair(tree_value, first_char)
     |> (fn {left, right} -> left > right end).()
@@ -134,9 +179,6 @@ defmodule TST do
         end).()
   end
 
-  @doc """
-  Creates a codepoint pair of the first letter in two strings.
-  """
   defp codepoint_pair(left, right) do
     {
       left |> String.codepoints() |> List.first(),
