@@ -1,6 +1,8 @@
-# Algorithms
+# Algorithms and Data Structures
 
-**TODO: Add description**
+This is a toy project of mine. My plan is to implement various algorithms and data structures to become up my skills as an elixir developer.
+
+I hope to learn a lot about the Elixir programming language and over time be better at writing idiomatic Elixir code.
 
 ## Installation
 
@@ -18,4 +20,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/algorithms](https://hexdocs.pm/algorithms).
-
