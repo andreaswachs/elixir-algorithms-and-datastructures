@@ -96,12 +96,21 @@ defmodule TST do
     |> then(&insert_in_direction(tst, key, value, &1))
   end
 
+
+
   defp insert_in_direction(%TST{value: tree_value, middle: next_middle} = tst, key, value, {first_char, rest}) do
     case next_middle do
-      nil -> %TST{tst | middle: insert(new(first_char), rest, value)}
+      nil -> case String.length(key) do
+               1 -> case first_char == tree_value do
+                      true ->  %TST{tst | item:   value }
+                      false -> %TST{tst | middle: insert(new(first_char), rest, value)}
+                    end
+               _  -> %TST{tst | middle: insert(new(first_char), rest, value)}
+              end
       _   ->  case insert_direction?(tree_value, first_char) do
-                :left  -> %TST{tst | left: insert(tst.left, key, value)}
-                :right -> %TST{tst | right: insert(tst.right, key, value)}
+                :left   -> %TST{tst | left:   insert(tst.left,   key,  value)}
+                :right  -> %TST{tst | right:  insert(tst.right,  key,  value)}
+                :middle -> %TST{tst | middle: insert(tst.middle, rest, value)}
               end
     end
   end
@@ -143,6 +152,11 @@ defmodule TST do
         end).()
   end
 
+  defp find(tst, key) when is_bitstring(key) do
+    String.next_grapheme(key)
+    |> then(&find(tst, &1))
+  end
+
   defp find(%TST{value: value, item: item} = _tst, {first_char, ""}) when value == first_char do
     case item do
       nil -> {:error, "nil item"}
@@ -167,22 +181,49 @@ defmodule TST do
   end
 
   ####################################################################################################
+  # Here comes functions to get items out of the data structure
+  ####################################################################################################
+
+  @doc """
+  Get the item stored by the given key.
+
+  Returns `{:ok, item}` or `{:error, msg}`
+
+  ## Parameters
+
+  - tst: The Ternary Search Trie that is being considered
+  - key: The key which might have an item associated with it
+
+  ## Examples
+  `
+  # TODO
+  `
+  """
+  @spec get(%TST{}, String.t()) :: {:ok | :error, any}
+  def get(tst, key) do
+    case find(tst, key) do
+      {:ok, item} -> {:ok, item}
+      {:error, _} -> {:error, "The key was not valid"}
+    end
+  end
+
+  ####################################################################################################
   # Here comes helper functions
   ####################################################################################################
 
   defp insert_direction?(tree_value, first_char) do
-    codepoint_pair(tree_value, first_char)
-    |> (fn {left, right} -> left > right end).()
-    |> (fn
-          true -> :left
-          false -> :right
-        end).()
+    first_letters(tree_value, first_char)
+    |> compare_letters()
   end
 
-  defp codepoint_pair(left, right) do
+  defp compare_letters({a, b}) when a == b, do: :middle
+  defp compare_letters({a, b}) when a > b, do: :left
+  defp compare_letters({a, b}) when a < b, do: :right
+
+  defp first_letters(left, right) do
     {
-      left |> String.codepoints() |> List.first(),
-      right |> String.codepoints() |> List.first()
+      left |> String.first(),
+      right |> String.first()
     }
   end
 end
