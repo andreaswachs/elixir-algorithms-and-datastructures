@@ -19,6 +19,10 @@ defmodule TST do
   # Here comes the functions for inserting values into the TST
   ####################################################################################################
 
+  @doc """
+  Insert a key-value pair into a TST. It is acceptable to pass nil as the first argument - a new TST
+  will then be created.
+  """
   @spec insert(%TST{}, String.t(), any) :: %TST{}
   def insert(tst, key, value) when is_nil(tst) do
     key
@@ -70,6 +74,9 @@ defmodule TST do
   # Here comes functions related to querying the TST if a key is valid
   ####################################################################################################
 
+  @doc """
+  Query the TST to see if a key is a valid key
+  """
   @spec exists?(nil | %TST{}, String.t()) :: boolean()
   def exists?(tst, _) when is_nil(tst), do: false
 
@@ -113,6 +120,11 @@ defmodule TST do
   # Here comes helper functions
   ####################################################################################################
 
+  @doc """
+  Makes a judgement based on the comparison of two codepoints to
+  signal an insertion function to either insert a key towards to left subtree
+  or the right subtree
+  """
   defp insert_direction?(tree_value, first_char) do
     codepoint_pair(tree_value, first_char)
     |> (fn {left, right} -> left > right end).()
@@ -122,6 +134,9 @@ defmodule TST do
         end).()
   end
 
+  @doc """
+  Creates a codepoint pair of the first letter in two strings.
+  """
   defp codepoint_pair(left, right) do
     {
       left |> String.codepoints() |> List.first(),
