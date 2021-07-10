@@ -10,8 +10,7 @@ defmodule TST do
   @spec new() :: %TST{}
   def new(), do: %TST{}
 
-  @spec new(String.t()) :: %TST{item: nil, left: nil, right: nil, middle: nil, value: String.t()}
-  def new(c) do
+  defp new(c) do
     %TST{value: c}
   end
 
