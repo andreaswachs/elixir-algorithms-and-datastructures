@@ -13,10 +13,10 @@ defmodule TST do
   Returns `%TST{}`
 
   ## Examples
-  ```
+  `
     iex> TST.new()
     %TST{item: nil, left: nil, middle: nil, right: nil, value: nil}
-  ```
+  `
   """
   @spec new() :: %TST{}
   def new(), do: %TST{}
