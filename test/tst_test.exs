@@ -27,7 +27,7 @@ defmodule TSTTest do
     tree = TST.new() |> TST.insert(key, value_1) |> TST.insert(key, value_2)
 
     assert TST.exists?(tree, key)
-    assert {:ok, ^value_2} = TST.get(tree, key)
+    assert {:ok, ^value_2} = TST.get_item(tree, key)
   end
 
   test "can insert multiple keys into TST and find all" do
@@ -47,6 +47,30 @@ defmodule TSTTest do
 
     tree = TST.new() |> TST.insert(key, value)
 
-    assert {:ok, ^value} = TST.get(tree, key)
+    assert {:ok, ^value} = TST.get_item(tree, key)
+  end
+
+  test "can get list of prefixes" do
+    key_1 = "bob"
+    key_2 = "bobine"
+    value = "value"
+
+    tree = TST.new() |> TST.insert(key_1, value) |> TST.insert(key_2, value)
+
+    assert ["bob", "bobine"] = TST.get_keys_with_prefix(tree, "bo")
+  end
+
+
+  test "attempt getting all keys with prefix john in empty tree" do
+    tree = TST.new()
+
+    assert [] = TST.get_keys_with_prefix(tree, "john")
+  end
+
+
+  test "attempt getting keys with empty key as prefixes in tree" do
+    tree = TST.new() |> TST.insert("key", "value") |> TST.insert("otherkey", "value")
+
+    assert ["key", "otherkey"] = TST.get_keys_with_prefix(tree, "")
   end
 end

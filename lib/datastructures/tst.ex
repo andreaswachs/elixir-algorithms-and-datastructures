@@ -25,7 +25,6 @@ defmodule TST do
     %TST{value: c}
   end
 
-
   ####################################################################################################
   # Here comes the functions for inserting values into the TST
   ####################################################################################################
@@ -69,15 +68,14 @@ defmodule TST do
   end
 
   def insert(%TST{value: tree_value, left: left, right: right, middle: middle} = tst, key, value)
-    when is_nil(tree_value) and is_nil(left) and is_nil(right) and is_nil(middle) do
-      # This function handles inserting into a 1 level deep TST that is empty
-      # Used to pass test case "can insert value into TST and it exists"
+      when is_nil(tree_value) and is_nil(left) and is_nil(right) and is_nil(middle) do
+    # This function handles inserting into a 1 level deep TST that is empty
+    # Used to pass test case "can insert value into TST and it exists"
     key
     |> String.next_grapheme()
     |> (fn {first_char, rest} ->
           insert(%TST{tst | value: first_char}, rest, value)
         end).()
-
   end
 
   def insert(tst, "", value) do
@@ -96,22 +94,31 @@ defmodule TST do
     |> then(&insert_in_direction(tst, key, value, &1))
   end
 
-
-
-  defp insert_in_direction(%TST{value: tree_value, middle: next_middle} = tst, key, value, {first_char, rest}) do
+  defp insert_in_direction(
+         %TST{value: tree_value, middle: next_middle} = tst,
+         key,
+         value,
+         {first_char, rest}
+       ) do
     case next_middle do
-      nil -> case String.length(key) do
-               1 -> case first_char == tree_value do
-                      true ->  %TST{tst | item:   value }
-                      false -> %TST{tst | middle: insert(new(first_char), rest, value)}
-                    end
-               _  -> %TST{tst | middle: insert(new(first_char), rest, value)}
-              end
-      _   ->  case insert_direction?(tree_value, first_char) do
-                :left   -> %TST{tst | left:   insert(tst.left,   key,  value)}
-                :right  -> %TST{tst | right:  insert(tst.right,  key,  value)}
-                :middle -> %TST{tst | middle: insert(tst.middle, rest, value)}
-              end
+      nil ->
+        case String.length(key) do
+          1 ->
+            case first_char == tree_value do
+              true -> %TST{tst | item: value}
+              false -> %TST{tst | middle: insert(new(first_char), rest, value)}
+            end
+
+          _ ->
+            %TST{tst | middle: insert(new(first_char), rest, value)}
+        end
+
+      _ ->
+        case insert_direction?(tree_value, first_char) do
+          :left -> %TST{tst | left: insert(tst.left, key, value)}
+          :right -> %TST{tst | right: insert(tst.right, key, value)}
+          :middle -> %TST{tst | middle: insert(tst.middle, rest, value)}
+        end
     end
   end
 
@@ -145,43 +152,45 @@ defmodule TST do
     key
     |> String.next_grapheme()
     |> (fn grapheme ->
-          case find(tst, grapheme) do
-            {:ok, _}    -> true
+          case get_item(tst, grapheme) do
+            {:ok, _} -> true
             {:error, _} -> false
           end
         end).()
   end
 
-  defp find(tst, key) when is_bitstring(key) do
+
+
+  def find_node(tst, key) when is_bitstring(key) do
     String.next_grapheme(key)
-    |> then(&find(tst, &1))
+    |> then(&find_node(tst, &1))
   end
 
-  defp find(%TST{value: value, item: item} = _tst, {first_char, ""}) when value == first_char do
-    case item do
-      nil -> {:error, "nil item"}
-      _   -> {:ok, item}
-    end
-  end
-
-  defp find(nil, _) do
+  def find_node(nil, _) do
     {:error, "nil subtree"}
   end
 
-  defp find(%TST{value: value}, {first_char, ""}) when value != first_char do
+  def find_node(%TST{value: value} = tst, {first_char, ""}) when value == first_char do
+    {:ok, tst}
+  end
+
+  def find_node(%TST{value: value}, {first_char, ""}) when value != first_char do
     {:error, "no match"}
   end
 
-  defp find(%TST{value: value, middle: middle, left: left, right: right}, {first_char, rest} = key) do
+  def find_node(
+         %TST{value: value, middle: middle, left: left, right: right},
+         {first_char, rest} = key
+       ) do
     cond do
-      value == first_char -> find(middle, String.next_grapheme(rest))
-      value > first_char  -> find(left, key)
-      value < first_char  -> find(right, key)
+      value == first_char -> find_node(middle, String.next_grapheme(rest))
+      value > first_char -> find_node(left, key)
+      value < first_char -> find_node(right, key)
     end
   end
 
   ####################################################################################################
-  # Here comes functions to get items out of the data structure
+  # Here comes functions to get items/nodes out of the data structure
   ####################################################################################################
 
   @doc """
@@ -199,13 +208,64 @@ defmodule TST do
   # TODO
   `
   """
-  @spec get(%TST{}, String.t()) :: {:ok | :error, any}
-  def get(tst, key) do
-    case find(tst, key) do
-      {:ok, item} -> {:ok, item}
+  @spec get_item(%TST{}, String.t()) :: {:ok | :error, any}
+  def get_item(tst, key) do
+    case find_node(tst, key) do
+      {:ok, subtree} -> case not is_nil(subtree.item) do
+                                           true  -> {:ok, subtree.item}
+                                           false -> {:error, "Key was not valid"}
+                                         end
       {:error, _} -> {:error, "The key was not valid"}
     end
   end
+
+  @spec get_node(%TST{}, String.t()) :: {:ok | :error, any}
+  def get_node(_, ""), do: {:error, "empty key"}
+
+  def get_node(tst, key) do
+    case find_node(tst, key) do
+      {:ok, subtree} -> {:ok, subtree.middle}
+      {:error, _} -> {:error, "The key was not valid"}
+    end
+  end
+
+
+  ####################################################################################################
+  # Here comes the all entries with prefix function
+  ####################################################################################################
+
+  @spec get_keys_with_prefix(%TST{}, String.t()) :: {atom(), any}
+  def get_keys_with_prefix(nil, _), do: {:error, "Empty data structure"}
+
+  def get_keys_with_prefix(tst, key) when key == "" or is_nil(key) do
+    prefix_collector(tst, "")
+  end
+
+  def get_keys_with_prefix(tst, key) do
+    case get_node(tst, key) do
+      {:ok, subtree} -> prefix_collector(subtree, key)
+      _ -> []
+    end
+  end
+
+  defp prefix_collector(nil, _), do: []
+
+  defp prefix_collector(%TST{value: value, item: item} = tst, key) when is_nil(item) do
+    # Not a hit on this one, we send the call further
+    prefix_collector(tst.left, key) ++
+    prefix_collector(tst.middle, key <> value) ++
+    prefix_collector(tst.right, key)
+  end
+
+  defp prefix_collector(%TST{value: value, item: item} = tst, key)
+    when not is_nil(item) do
+      # We've hit a node with an valid item
+      prefix_collector(tst.left, key) ++
+      [key <> value] ++
+      prefix_collector(tst.middle, key) ++
+      prefix_collector(tst.right, key)
+  end
+
 
   ####################################################################################################
   # Here comes helper functions
