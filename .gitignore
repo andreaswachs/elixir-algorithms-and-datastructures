@@ -26,6 +26,9 @@ algorithms-*.tar
 # Temporary files for e.g. tests
 /tmp
 
+# VS Code config file
+launch.json
+
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/elixir,macos
