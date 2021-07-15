@@ -55,18 +55,10 @@ defmodule Graph do
         graph
         |> Map.get(from, [])
         |> List.insert_at(0, Edge.new(from, to, weight))
-        |> then(fn adj_list -> %{graph | from => adj_list, edges: edges + 1} end)
+        |> then(fn adj_list -> %{graph | from => adj_list, edges: (unless insert_inverse_edge, do: edges + 1, else: edges)} end)
         # figure out why this goes into an infinite loop
         |> then(fn new_graph -> if not graph.directed and not insert_inverse_edge, do: add_edge(new_graph, to, from, weight, true), else: new_graph end)
   end
-
-
-  ##################################################################################################
-  # Notes for later:
-  # Interpret from and to vertex for new edges from text:
-  #   Regex.named_captures(~r/(?<from>\d+) ?-> ?(?<to>\d+)/, "1-> 2")
-  ##################################################################################################
-
 
 
 end
