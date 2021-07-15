@@ -1,4 +1,10 @@
 defmodule Edge do
+  @moduledoc """
+  The edge module reflects edges.
+
+  Here is a struct defined for an edge, that shows vital information for a given
+  edge such as where it coems from, goes to and what the weight of the edge is
+  """
 
   defstruct from: nil, to: nil, weight: 0
 

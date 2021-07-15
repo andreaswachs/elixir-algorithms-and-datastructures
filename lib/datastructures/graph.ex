@@ -39,7 +39,8 @@ defmodule Graph do
   ####################################################################################################
 
   @doc """
-  Add an edge in a graph.
+  Add an edge in a graph. Defaults to unweighted edges and takes care of the case that the graph
+  is undirected
 
   ## Parameters
   - graph: The graph data structure from this module
