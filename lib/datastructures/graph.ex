@@ -91,7 +91,7 @@ defmodule Graph do
   defp update_edges_count(%{edges: edges, directed: directed} = _graph, insert_inverse_edge) do
     cond do
       directed -> edges + 1
-      directed or not directed and not insert_inverse_edge -> edges + 1
+      not directed and not insert_inverse_edge -> edges + 1
       true -> edges
     end
   end
