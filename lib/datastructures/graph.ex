@@ -39,7 +39,7 @@ defmodule Graph do
   ####################################################################################################
 
   @spec add_edge(
-          %Graph{:edges => non_neg_integer(), :vertices => non_neg_integer()},
+          %Graph{:vertices => non_neg_integer()},
           non_neg_integer,
           non_neg_integer,
           integer,
@@ -50,14 +50,25 @@ defmodule Graph do
           :vertices => any,
           optional(any) => any
         }
-  def add_edge(%Graph{vertices: vertices, edges: edges} = graph, from, to, weight \\ 0, insert_inverse_edge \\ false)
+  def add_edge(%Graph{vertices: vertices} = graph, from, to, weight \\ 0, insert_inverse_edge \\ false)
       when from < vertices and to < vertices do
         graph
         |> Map.get(from, [])
         |> List.insert_at(0, Edge.new(from, to, weight))
-        |> then(fn adj_list -> %{graph | from => adj_list, edges: (unless insert_inverse_edge, do: edges + 1, else: edges)} end)
-        # figure out why this goes into an infinite loop
-        |> then(fn new_graph -> if not graph.directed and not insert_inverse_edge, do: add_edge(new_graph, to, from, weight, true), else: new_graph end)
+        |> then(&update_adj_list(graph, from, &1, insert_inverse_edge))
+        |> then(&maybe_insert_inverse_edge(&1,from, to, weight, insert_inverse_edge))
+  end
+
+  defp update_adj_list(%{edges: edges} = graph, vertex, adj_list, insert_inverse_edge) do
+    # Insert the updated adjacency list for the correct vertex and maybe update edges count
+    %{graph | vertex => adj_list, edges: (unless insert_inverse_edge, do: edges + 1, else: edges)}
+  end
+
+  defp maybe_insert_inverse_edge(graph, from, to, weight, insert_inverse_edge) do
+    case not graph.directed and not insert_inverse_edge do
+      true -> add_edge(graph, to, from, weight, true)
+      false -> graph
+    end
   end
 
 
