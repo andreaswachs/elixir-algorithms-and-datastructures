@@ -32,6 +32,18 @@ defmodule Graph do
   # Should also support directed edges
   ####################################################################################################
 
+  @spec add_edge(
+          %Graph{:edges => non_neg_integer(), :vertices => non_neg_integer()},
+          non_neg_integer,
+          non_neg_integer,
+          integer,
+          any
+        ) :: %{
+          :__struct__ => Graph | [...],
+          :edges => number,
+          :vertices => any,
+          optional(any) => any
+        }
   def add_edge(%Graph{vertices: vertices, edges: edges} = graph, from, to, weight \\ 0, directed \\ false)
       when from < vertices and to < vertices do
         graph
@@ -40,4 +52,14 @@ defmodule Graph do
         |> then(fn adj_list -> %{graph | from => adj_list, edges: edges + 1} end)
         |> then(fn new_graph -> if directed, do: add_edge(new_graph, to, from, weight), else: new_graph end)
   end
+
+
+  ##################################################################################################
+  # Notes for later:
+  # Interpret from and to vertex for new edges from text:
+  #   Regex.named_captures(~r/(?<from>\d+) ?-> ?(?<to>\d+)/, "1-> 2")
+  ##################################################################################################
+
+
+
 end
