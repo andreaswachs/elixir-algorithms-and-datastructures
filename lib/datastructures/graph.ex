@@ -46,6 +46,16 @@ defmodule Graph do
   - from: the vertex id of the vertex where the edge goes from
   - to: the vertex id of the vertex where the edge goes to
   - weight: the weight of the edge (optional, default value: 0)
+
+  ## Examples
+
+  ```
+  # Create an undirected graph with two vertices and add an edge between them
+  graph = Graph.new(2) |> Graph.add_edge(0, 1)
+
+  # Create a directed graph with two vertices and add an edge from vertex 0 to 1
+  graph = Graph.new(2, true) |> Graph.add_edge(0, 1)
+  ```
   """
   @spec add_edge(
           %Graph{:vertices => non_neg_integer()},
