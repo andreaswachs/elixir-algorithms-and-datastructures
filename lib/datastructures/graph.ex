@@ -38,19 +38,32 @@ defmodule Graph do
   # Should also support directed edges
   ####################################################################################################
 
+  @doc """
+  Add an edge in a graph.
+
+  ## Parameters
+  - graph: The graph data structure from this module
+  - from: the vertex id of the vertex where the edge goes from
+  - to: the vertex id of the vertex where the edge goes to
+  - weight: the weight of the edge (optional, default value: 0)
+  """
   @spec add_edge(
           %Graph{:vertices => non_neg_integer()},
           non_neg_integer,
           non_neg_integer,
-          integer,
-          any
+          integer
         ) :: %{
           :__struct__ => Graph | [...],
           :edges => number,
           :vertices => any,
           optional(any) => any
         }
-  def add_edge(%Graph{vertices: vertices} = graph, from, to, weight \\ 0, insert_inverse_edge \\ false)
+  def add_edge(%Graph{vertices: vertices} = graph, from, to, weight \\ 0)
+      when from < vertices and to < vertices do
+      add_edge_server(graph, from, to, weight, not graph.directed)
+  end
+
+  defp add_edge_server(%Graph{vertices: vertices} = graph, from, to, weight, insert_inverse_edge)
       when from < vertices and to < vertices do
         graph
         |> Map.get(from, [])
@@ -59,14 +72,22 @@ defmodule Graph do
         |> then(&maybe_insert_inverse_edge(&1,from, to, weight, insert_inverse_edge))
   end
 
-  defp update_adj_list(%{edges: edges} = graph, vertex, adj_list, insert_inverse_edge) do
+  defp update_adj_list(graph, vertex, adj_list, insert_inverse_edge) do
     # Insert the updated adjacency list for the correct vertex and maybe update edges count
-    %{graph | vertex => adj_list, edges: (unless insert_inverse_edge, do: edges + 1, else: edges)}
+    %{graph | vertex => adj_list, edges: update_edges_count(graph, insert_inverse_edge)}
+  end
+
+  defp update_edges_count(%{edges: edges, directed: directed} = _graph, insert_inverse_edge) do
+    cond do
+      directed -> edges + 1
+      directed or not directed and not insert_inverse_edge -> edges + 1
+      true -> edges
+    end
   end
 
   defp maybe_insert_inverse_edge(graph, from, to, weight, insert_inverse_edge) do
-    case not graph.directed and not insert_inverse_edge do
-      true -> add_edge(graph, to, from, weight, true)
+    case insert_inverse_edge do
+      true -> add_edge_server(graph, to, from, weight, false)
       false -> graph
     end
   end
