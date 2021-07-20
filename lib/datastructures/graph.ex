@@ -104,4 +104,21 @@ defmodule Graph do
   end
 
 
+  ##################################################################################################
+  # Functions for supporting getting adjacent vertices in a graph
+  ##################################################################################################
+
+  @spec adjacent_vertices(%Graph{}, non_neg_integer()) :: [non_neg_integer()]
+  def adjacent_vertices(nil, _vertex) do
+    []
+  end
+
+  def adjacent_vertices(%Graph{vertices: vertices} = _graph, vertex) when vertex >= vertices do
+    []
+  end
+
+  def adjacent_vertices(graph, vertex) do
+    Map.get(graph, vertex, [])
+  end
+
 end
