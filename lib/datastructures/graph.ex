@@ -108,6 +108,14 @@ defmodule Graph do
   # Functions for supporting getting adjacent vertices in a graph
   ##################################################################################################
 
+  # TODO: This function name is not precise, as were offering to get the adjacent vertices, but return a list of
+  #       edges that is connected to the given vertex
+
+  @doc """
+  Get a list of edges that are connected in one end to the given vertex
+
+
+  """
   @spec adjacent_vertices(%Graph{}, non_neg_integer()) :: [non_neg_integer()]
   def adjacent_vertices(nil, _vertex) do
     []
