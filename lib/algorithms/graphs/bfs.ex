@@ -38,7 +38,7 @@ defmodule Graph.BFS do
     case :queue.out(queue) do
       {{:value, vertex}, new_queue} ->
         case vertex in visited_edges do
-          false -> Graph.adjacent_vertices(graph, vertex)
+          false -> Graph.get_edges(graph, vertex)
                     |> then(&handle_run(graph,
                                         enqueue_adjacent_vertices(new_queue, &1),
                                         transform_adjacency_list(&1) ++ components,

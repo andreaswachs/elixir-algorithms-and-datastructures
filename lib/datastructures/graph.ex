@@ -116,16 +116,16 @@ defmodule Graph do
 
 
   """
-  @spec adjacent_vertices(%Graph{}, non_neg_integer()) :: [non_neg_integer()]
-  def adjacent_vertices(nil, _vertex) do
+  @spec get_edges(%Graph{}, non_neg_integer()) :: [non_neg_integer()]
+  def get_edges(nil, _vertex) do
     []
   end
 
-  def adjacent_vertices(%Graph{vertices: vertices} = _graph, vertex) when vertex >= vertices do
+  def get_edges(%Graph{vertices: vertices} = _graph, vertex) when vertex >= vertices do
     []
   end
 
-  def adjacent_vertices(graph, vertex) do
+  def get_edges(graph, vertex) do
     Map.get(graph, vertex, [])
   end
 
