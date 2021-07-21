@@ -104,17 +104,14 @@ defmodule Graph do
   end
 
 
-  ##################################################################################################
-  # Functions for supporting getting adjacent vertices in a graph
-  ##################################################################################################
 
-  # TODO: This function name is not precise, as were offering to get the adjacent vertices, but return a list of
-  #       edges that is connected to the given vertex
 
+
+  ##################################################################################################
+  # Functions for getting all the edges going out from a given vertex
+  ##################################################################################################
   @doc """
   Get a list of edges that are connected in one end to the given vertex
-
-
   """
   @spec get_edges(%Graph{}, non_neg_integer()) :: [non_neg_integer()]
   def get_edges(nil, _vertex) do
@@ -129,4 +126,37 @@ defmodule Graph do
     Map.get(graph, vertex, [])
   end
 
+  ##################################################################################################
+  # Functions for supporting getting adjacent vertices in a graph
+  ##################################################################################################
+
+  @doc """
+  Get a list of the connected vertices from a given source vertex.
+  The list will contain the id's of the connected vertices.
+
+  ## Parameters
+
+  - graph: The graph data structure
+  - vertex: the source vertex possibly with edges to other vertices
+
+
+  ## Examples
+
+  ```elixir
+  iex> Graph.new(5, true) |> Graph.add_edge(0, 1) |> Graph.add_edge(1, 2)|> Graph.add_edge(0, 0) |> Graph.adjacent_vertices(0)
+  [0, 1]
+  ```
+  """
+  @spec adjacent_vertices(nil | %Graph{:vertices => any}, any) :: list
+  def adjacent_vertices(nil, _veretx) do
+    []
+  end
+
+  def adjacent_vertices(%Graph{vertices: vertices} = _graph, vertex) when vertex >= vertices do
+    []
+  end
+
+  def adjacent_vertices(graph, vertex) do
+    for edge <- get_edges(graph, vertex), do: edge.to
+  end
 end
