@@ -31,19 +31,19 @@ defmodule Graph.BFS do
   def run(graph, source) do
     :queue.new()
     |> then(&:queue.in(source, &1))
-    |> then(&run_server(graph, &1, [], []))
+    |> then(&handle_run(graph, &1, [], []))
   end
 
-  defp run_server(graph, queue, components, visited_edges) do
+  defp handle_run(graph, queue, components, visited_edges) do
     case :queue.out(queue) do
       {{:value, vertex}, new_queue} ->
         case vertex in visited_edges do
           false -> Graph.adjacent_vertices(graph, vertex)
-                    |> then(&run_server(graph,
+                    |> then(&handle_run(graph,
                                         enqueue_adjacent_vertices(new_queue, &1),
                                         transform_adjacency_list(&1) ++ components,
                                         [vertex] ++ visited_edges))
-          true -> run_server(graph, new_queue, components, visited_edges)
+          true -> handle_run(graph, new_queue, components, visited_edges)
         end
 
       {:empty, _} -> components |> sanitize_adjacency_pairs() |> Enum.reverse()
