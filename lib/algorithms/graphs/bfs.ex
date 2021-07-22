@@ -78,6 +78,32 @@ defmodule Graph.BFS do
   # Function(s) for using BFS to see if two vertices are connected
   ##################################################################################################
 
+  @doc """
+  Query a given graph to see if two vertices are connected to each other.
+  This utilises the BFS, hence why this function is located here.
+
+  Vertices are implicitly connected to themselves and therefore queries into the connectedness of the
+  same vertex will always return true.
+
+  ## Parameters
+
+  - graph: The given graph, which is a struct from the Graph module
+  - source: The source vertex, one of the vertices to check to see if it connected with the next
+  - target: The target vertex, the other verte to see if it is coonnected with the source vertex
+
+  ## Examples
+  ```elixir
+  iex> Graph.new(2) |> Graph.add_edge(0, 1) |> Graph.BFS.is_connected(0, 1)
+  true
+
+  iex> Graph.new(2) |> Graph.is_connected(0, 1)
+  false
+
+  iex> Graph.new(2) ) |> Graph.BFS.is_connected(0, 0)
+  true
+  ```
+  """
+  @spec is_connected(%Graph{}, non_neg_integer(), non_neg_integer()) :: boolean()
   def is_connected(nil, _, _), do: false
   def is_connected(%Graph{vertices: vertices} = _graph, source, target) when source >= vertices or target >= vertices, do: false
   def is_connected(_, source, target) when source < 0 or target < 0, do: false
