@@ -74,4 +74,34 @@ defmodule Graph.BFS do
     end
   end
 
+  ##################################################################################################
+  # Function(s) for using BFS to see if two vertices are connected
+  ##################################################################################################
+
+  def is_connected(nil, _, _), do: false
+  def is_connected(%Graph{vertices: vertices} = _graph, source, target) when source >= vertices or target >= vertices, do: false
+  def is_connected(_, source, target) when source < 0 or target < 0, do: false
+
+  def is_connected(graph, source, target) do
+    handle_is_connected(graph, source, target, Graph.BFS.run(graph, source))
+  end
+
+  defp handle_is_connected(_graph, source, target, _run) when source == target, do: true
+
+  defp handle_is_connected(graph, source, target, connected_pairs) do
+    case get_pairs_with_target(connected_pairs, target) do
+      {:error, _} -> source == target
+      {:ok, pairs_list} -> [(for {from, _} <- pairs_list, do: handle_is_connected(graph, source, from, connected_pairs))]
+                          |> List.flatten()
+                          |> then(fn result_list -> true in result_list end)
+      end
+  end
+
+  defp get_pairs_with_target(pairs, target) do
+    Enum.filter(pairs, fn {_, to} -> to == target end)
+    |> then(fn
+          [] -> {:error, "No connection to target"}
+          list -> {:ok, list}
+    end)
+  end
 end
