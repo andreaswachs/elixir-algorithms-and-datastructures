@@ -96,10 +96,10 @@ defmodule Graph.BFS do
   iex> Graph.new(2) |> Graph.add_edge(0, 1) |> Graph.BFS.is_connected(0, 1)
   true
 
-  iex> Graph.new(2) |> Graph.is_connected(0, 1)
+  iex> Graph.new(2) |> Graph.BFS.is_connected(0, 1)
   false
 
-  iex> Graph.new(2) ) |> Graph.BFS.is_connected(0, 0)
+  iex> Graph.new(2) |> Graph.BFS.is_connected(0, 0)
   true
   ```
   """

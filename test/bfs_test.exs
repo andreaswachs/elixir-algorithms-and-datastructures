@@ -70,4 +70,30 @@ defmodule BFSTest do
     assert result == true
   end
 
+
+  test "query nil graph to see if two vertices are connected" do
+    graph = nil
+
+    result = Graph.BFS.is_connected(graph, 0, 1)
+
+    assert result == false
+  end
+
+  test "query graph connectedness vertices that are not in graph" do
+    graph = Graph.new(2)
+
+    result = Graph.BFS.is_connected(graph, 2, 3)
+
+    assert result == false
+  end
+
+ test "query graph connectedness negative vertices that are not in graph" do
+    graph = Graph.new(2)
+
+    result = Graph.BFS.is_connected(graph, -2, -3)
+
+    assert result == false
+  end
+
+
 end
