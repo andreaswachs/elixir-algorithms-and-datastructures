@@ -44,4 +44,30 @@ defmodule BFSTest do
     assert {0, 1} in result
     assert {0, 0} in result
   end
+
+
+  test "can query graph to see if two vertices that are connected if they are connected" do
+    graph = Graph.new(2) |> Graph.add_edge(0, 1)
+
+    result = Graph.BFS.is_connected(graph, 0, 1)
+
+    assert result == true
+  end
+
+  test "can query graph to see if two vertices that are not connected if they are connected" do
+    graph = Graph.new(2)
+
+    result = Graph.BFS.is_connected(graph, 0, 1)
+
+    assert result == false
+  end
+
+  test "can query graph to see if a vertex is connected to itself and it always is" do
+    graph = Graph.new(1)
+
+    result = Graph.BFS.is_connected(graph, 0, 0)
+
+    assert result == true
+  end
+
 end
