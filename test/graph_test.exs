@@ -41,4 +41,56 @@ defmodule GraphTest do
     assert length(Map.get(graph, 1)) == 2
     assert length(Map.get(graph, 2)) == 2
   end
+
+  test "get adjacent vertices for a connected component with one adjacent vertex" do
+    graph =
+      Graph.new(2)
+      |> Graph.add_edge(0, 1)
+
+    result = Graph.adjacent_vertices(graph, 0)
+
+    assert 1 in result
+    assert length(result) == 1
+  end
+
+  test "get adjacnt vertices for a disconnected component" do
+    graph =
+      Graph.new(2)
+
+    result = Graph.adjacent_vertices(graph, 0)
+
+    assert result == []
+  end
+
+  test "get adjacent vertices for a connected component with many adjacent vertices" do
+    graph =
+      Graph.new(4)
+      |> Graph.add_edge(0, 1)
+      |> Graph.add_edge(0, 2)
+      |> Graph.add_edge(0, 3)
+
+      result = Graph.adjacent_vertices(graph, 0)
+
+      assert 1 in result
+      assert 2 in result
+      assert 3 in result
+      assert length(result) == 3
+  end
+
+  test "get adjacent vertices in a nil graph" do
+    graph = nil
+
+    result = Graph.adjacent_vertices(graph, 0)
+
+    assert result == []
+  end
+
+  test "get adjacent vertices in a graph not containing queried vertex" do
+    graph = Graph.new(4)
+
+    result = Graph.adjacent_vertices(graph, 5)
+
+    assert result == []
+  end
+
 end
