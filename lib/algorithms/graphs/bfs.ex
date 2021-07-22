@@ -52,9 +52,8 @@ defmodule Graph.BFS do
 
   defp enqueue_adjacent_vertices(queue, []), do: queue
 
-  defp enqueue_adjacent_vertices(queue, [head | tail] = _adjacency_list) do
-    head.to
-    |> :queue.in(queue)
+  defp enqueue_adjacent_vertices(queue, [%Edge{to: to} = _head | tail] = _adjacency_list) do
+    :queue.in(to, queue)
     |> enqueue_adjacent_vertices(tail)
   end
 
