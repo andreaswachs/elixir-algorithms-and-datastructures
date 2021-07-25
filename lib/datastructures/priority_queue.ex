@@ -15,9 +15,19 @@ defmodule PriorityQueue do
   @spec new(fun()) :: {%{fun: fun(), size: non_neg_integer()}}
   def new(fun), do: {%{fun: fun, size: 0}}
 
+  @doc """
+  Create a minimum oriented priority queue.
+
+  This is for inserting items and always popping out the item with the lowest value in the queue.
+  """
   @spec new_minpq :: {%{fun: fun, size: 0}}
   def new_minpq(), do: new(fn x, y -> x > y end)
 
+  @doc """
+  Create a maximum oriented priority queue.
+
+  This is for inserting items and always popping out the item with the highest value in the queue.
+  """
   @spec new_maxpq :: {%{fun: fun, size: 0}}
   def new_maxpq(), do: new(fn x, y -> x < y end)
 
@@ -86,4 +96,35 @@ defmodule PriorityQueue do
     |> put_elem(that, this_item)
   end
 
+
+  ##################################################################################################
+  # Here comes functions for dequeueing
+  ##################################################################################################
+
+
+  def dequeue(nil) do
+    {:error, "queue is nil"}
+  end
+
+  def dequeue(pq) do
+    case get_size(pq) do
+      0 -> {:error, "Queue is empty"}
+      size -> exchange(pq, 1, size)
+      |> sink()
+      |> Tuple.delete_at(size)
+      |> then(fn new_pq -> put_elem(new_pq, 0, %{elem(new_pq, 0) | size: size - 1}) end)
+      |> then(fn new_pq -> {:ok, new_pq, elem(pq, 1)} end)
+    end
+  end
+
+  def sink(pq, index \\ 1) do
+    case (j = 2 * index) <= (n = get_size(pq)) do
+      true -> cond do
+                j < n and maintains_heap_ordering(pq, j, index) -> sink(pq, j + 1)
+                not maintains_heap_ordering(pq, j, index) -> pq
+                true -> exchange(pq, j, index)
+              end
+      false -> pq
+    end
+  end
 end
