@@ -102,6 +102,13 @@ defmodule PriorityQueue do
   ##################################################################################################
 
 
+  @doc """
+  Dequeue the item with the highest priority. This means that for maximum oriented heaps, the largest item
+  will be dequeued.
+
+  This implementation follows from the Sedgewick and Wayne's implementation from their Algorithms website.
+  """
+  @spec dequeue(tuple()) :: {:error, String.t()} | {:ok, tuple(), tuple()}
   def dequeue(nil) do
     {:error, "Queue is nil"}
   end
