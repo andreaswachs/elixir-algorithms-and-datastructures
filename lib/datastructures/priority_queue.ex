@@ -103,7 +103,7 @@ defmodule PriorityQueue do
 
 
   def dequeue(nil) do
-    {:error, "queue is nil"}
+    {:error, "Queue is nil"}
   end
 
   def dequeue(pq) do
