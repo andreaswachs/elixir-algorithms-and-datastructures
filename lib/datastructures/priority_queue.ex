@@ -50,7 +50,6 @@ defmodule PriorityQueue do
   ```elixir
 
   iex> PriorityQueue.new_maxpq() |> PriorityQueue.insert(1) |> PriorityQueue.insert(100)
-  {%{fun: #Function<0.128179959/2 in PriorityQueue.new_maxpq/0>, size: 2}, 100, 1}
   ```
 
   """
@@ -74,7 +73,12 @@ defmodule PriorityQueue do
   # Here comes general helper functiosn for the entire module
   ##################################################################################################
 
-  defp get_size(pq), do: elem(pq, 0) |> then(fn meta_data -> meta_data.size end)
+  @doc """
+  Get the size of the queue, which is the count of all the elements that are in the queue.
+  """
+
+  @spec get_size(tuple()) :: non_neg_integer()
+  def get_size(pq), do: elem(pq, 0) |> then(fn meta_data -> meta_data.size end)
 
   defp heap_order_functon(pq) do
     elem(pq, 0)
@@ -127,7 +131,7 @@ defmodule PriorityQueue do
   def sink(pq, index \\ 1) do
     case (j = 2 * index) <= (n = get_size(pq)) do
       true -> cond do
-                j < n and maintains_heap_ordering(pq, j, index) -> sink(pq, j + 1)
+                j < n and maintains_heap_ordering(pq, j, index) -> pq |> tap(IO.puts("sinking to the right")) |> tap(IO.inspect(pq))|> sink(j + 1)
                 not maintains_heap_ordering(pq, j, index) -> pq
                 true -> exchange(pq, j, index)
               end
