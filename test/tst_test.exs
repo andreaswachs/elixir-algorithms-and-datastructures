@@ -2,7 +2,6 @@ defmodule TSTTest do
   use ExUnit.Case
   doctest TST
 
-
   test "creates empty TST" do
     expected = %TST{item: nil, left: nil, middle: nil, right: nil, value: nil}
 
@@ -60,13 +59,11 @@ defmodule TSTTest do
     assert ["bob", "bobine"] = TST.get_keys_with_prefix(tree, "bo")
   end
 
-
   test "attempt getting all keys with prefix john in empty tree" do
     tree = TST.new()
 
     assert [] = TST.get_keys_with_prefix(tree, "john")
   end
-
 
   test "attempt getting keys with empty key as prefixes in tree" do
     tree = TST.new() |> TST.insert("key", "value") |> TST.insert("otherkey", "value")

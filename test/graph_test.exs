@@ -54,8 +54,7 @@ defmodule GraphTest do
   end
 
   test "get adjacnt vertices for a disconnected component" do
-    graph =
-      Graph.new(2)
+    graph = Graph.new(2)
 
     result = Graph.adjacent_vertices(graph, 0)
 
@@ -69,12 +68,12 @@ defmodule GraphTest do
       |> Graph.add_edge(0, 2)
       |> Graph.add_edge(0, 3)
 
-      result = Graph.adjacent_vertices(graph, 0)
+    result = Graph.adjacent_vertices(graph, 0)
 
-      assert 1 in result
-      assert 2 in result
-      assert 3 in result
-      assert length(result) == 3
+    assert 1 in result
+    assert 2 in result
+    assert 3 in result
+    assert length(result) == 3
   end
 
   test "get adjacent vertices in a nil graph" do
@@ -92,5 +91,4 @@ defmodule GraphTest do
 
     assert result == []
   end
-
 end

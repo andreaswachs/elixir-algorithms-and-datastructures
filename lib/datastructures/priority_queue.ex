@@ -64,7 +64,7 @@ defmodule PriorityQueue do
   defp swim(pq, index) do
     case index > 1 and maintains_heap_ordering(pq, div(index, 2), index) do
       true -> exchange(pq, div(index, 2), index) |> swim(div(index, 2))
-      false -> pq |> IO.inspect(label: "Swim returned the pq with maintains_heap_ordering() = #{maintains_heap_ordering(pq, div(index, 2), index)} and index = #{index} and next index = #{div(index, 2)}")
+      false -> pq
     end
   end
 
@@ -151,12 +151,15 @@ defmodule PriorityQueue do
             determine_element_to_swim(pq, j, j + 1)
             |> then(fn next -> {exchange(pq, index, next), next} end)
             |> then(fn {new_pq, next} -> sink(new_pq, next) end)
-          true -> # j < n
+
+          # j < n
+          true ->
             case maintains_heap_ordering(pq, j, index) do
               true -> pq
               false -> exchange(pq, j, index) |> swim(j)
             end
         end
+
       false ->
         pq
     end

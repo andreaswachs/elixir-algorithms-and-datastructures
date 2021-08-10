@@ -3,7 +3,6 @@ defmodule Graph.BFS do
   This module allows users to run Breadth First Searches on graphs, from a source vertex.
   """
 
-
   @spec run(%Graph{}, non_neg_integer()) :: [{non_neg_integer(), non_neg_integer()}]
   def run(%Graph{vertices: vertices} = graph, source) when is_nil(graph) or source >= vertices do
     []
@@ -38,15 +37,23 @@ defmodule Graph.BFS do
     case :queue.out(queue) do
       {{:value, vertex}, new_queue} ->
         case vertex in visited_edges do
-          false -> Graph.get_edges(graph, vertex)
-                    |> then(&handle_run(graph,
-                                        enqueue_adjacent_vertices(new_queue, &1),
-                                        transform_adjacency_list(&1) ++ components,
-                                        [vertex] ++ visited_edges))
-          true -> handle_run(graph, new_queue, components, visited_edges)
+          false ->
+            Graph.get_edges(graph, vertex)
+            |> then(
+              &handle_run(
+                graph,
+                enqueue_adjacent_vertices(new_queue, &1),
+                transform_adjacency_list(&1) ++ components,
+                [vertex] ++ visited_edges
+              )
+            )
+
+          true ->
+            handle_run(graph, new_queue, components, visited_edges)
         end
 
-      {:empty, _} -> components |> sanitize_adjacency_pairs() |> Enum.reverse()
+      {:empty, _} ->
+        components |> sanitize_adjacency_pairs() |> Enum.reverse()
     end
   end
 
@@ -59,7 +66,7 @@ defmodule Graph.BFS do
 
   defp transform_adjacency_list(adjacency_list) do
     # Transforms the list of edges to tuples with {from, to} vertices numbers
-    [(for edge <- adjacency_list, do: {edge.from, edge.to})]
+    [for(edge <- adjacency_list, do: {edge.from, edge.to})]
     |> List.flatten()
     |> sanitize_adjacency_pairs()
   end
@@ -104,7 +111,11 @@ defmodule Graph.BFS do
   """
   @spec is_connected(%Graph{}, non_neg_integer(), non_neg_integer()) :: boolean()
   def is_connected(nil, _, _), do: false
-  def is_connected(%Graph{vertices: vertices} = _graph, source, target) when source >= vertices or target >= vertices, do: false
+
+  def is_connected(%Graph{vertices: vertices} = _graph, source, target)
+      when source >= vertices or target >= vertices,
+      do: false
+
   def is_connected(_, source, target) when source < 0 or target < 0, do: false
 
   def is_connected(graph, source, target) do
@@ -115,18 +126,26 @@ defmodule Graph.BFS do
 
   defp handle_is_connected(graph, source, target, connected_pairs) do
     case get_pairs_with_target(connected_pairs, target) do
-      {:error, _} -> source == target
-      {:ok, pairs_list} -> [(for {from, _} <- pairs_list, do: handle_is_connected(graph, source, from, connected_pairs))]
-                          |> List.flatten()
-                          |> then(fn result_list -> true in result_list end)
-      end
+      {:error, _} ->
+        source == target
+
+      {:ok, pairs_list} ->
+        [
+          for(
+            {from, _} <- pairs_list,
+            do: handle_is_connected(graph, source, from, connected_pairs)
+          )
+        ]
+        |> List.flatten()
+        |> then(fn result_list -> true in result_list end)
+    end
   end
 
   defp get_pairs_with_target(pairs, target) do
     Enum.filter(pairs, fn {_, to} -> to == target end)
     |> then(fn
-          [] -> {:error, "No connection to target"}
-          list -> {:ok, list}
+      [] -> {:error, "No connection to target"}
+      list -> {:ok, list}
     end)
   end
 end

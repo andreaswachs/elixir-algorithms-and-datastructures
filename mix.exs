@@ -9,7 +9,6 @@ defmodule EADS.MixProject do
       start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
-
       description: description(),
       # Docs
       name: "Elixir Algorithms and Data Structures (eads)",
@@ -29,9 +28,9 @@ defmodule EADS.MixProject do
   end
 
   defp description() do
-    "This is a library where algorithms and data structures will be implemented. "
-    <> "The university course in algorithms and data structures will be my main "
-    <> "source of ideas for stuff to implement."
+    "This is a library where algorithms and data structures will be implemented. " <>
+      "The university course in algorithms and data structures will be my main " <>
+      "source of ideas for stuff to implement."
   end
 
   defp package() do

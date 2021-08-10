@@ -71,16 +71,16 @@ defmodule Graph do
         }
   def add_edge(%Graph{vertices: vertices} = graph, from, to, weight \\ 0)
       when from < vertices and to < vertices do
-      add_edge_server(graph, from, to, weight, not graph.directed)
+    add_edge_server(graph, from, to, weight, not graph.directed)
   end
 
   defp add_edge_server(%Graph{vertices: vertices} = graph, from, to, weight, insert_inverse_edge)
-      when from < vertices and to < vertices do
-        graph
-        |> Map.get(from, [])
-        |> List.insert_at(0, Edge.new(from, to, weight))
-        |> then(&update_adj_list(graph, from, &1, insert_inverse_edge))
-        |> then(&maybe_insert_inverse_edge(&1,from, to, weight, insert_inverse_edge))
+       when from < vertices and to < vertices do
+    graph
+    |> Map.get(from, [])
+    |> List.insert_at(0, Edge.new(from, to, weight))
+    |> then(&update_adj_list(graph, from, &1, insert_inverse_edge))
+    |> then(&maybe_insert_inverse_edge(&1, from, to, weight, insert_inverse_edge))
   end
 
   defp update_adj_list(graph, vertex, adj_list, insert_inverse_edge) do
@@ -102,10 +102,6 @@ defmodule Graph do
       false -> graph
     end
   end
-
-
-
-
 
   ##################################################################################################
   # Functions for getting all the edges going out from a given vertex

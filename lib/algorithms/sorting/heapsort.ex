@@ -32,9 +32,12 @@ defmodule Heapsort do
 
   defp handle_dequeueing(pq, acc \\ []) do
     case PriorityQueue.get_size(pq) do
-      0 -> acc
-      _ -> widthdraw_next_item(pq)
-            |> then(fn {new_pq, value} -> handle_dequeueing(new_pq, [value] ++ acc) end)
+      0 ->
+        acc
+
+      _ ->
+        widthdraw_next_item(pq)
+        |> then(fn {new_pq, value} -> handle_dequeueing(new_pq, [value] ++ acc) end)
     end
   end
 

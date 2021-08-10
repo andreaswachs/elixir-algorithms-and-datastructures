@@ -159,8 +159,6 @@ defmodule TST do
         end).()
   end
 
-
-
   def find_node(tst, key) when is_bitstring(key) do
     String.next_grapheme(key)
     |> then(&find_node(tst, &1))
@@ -179,9 +177,9 @@ defmodule TST do
   end
 
   def find_node(
-         %TST{value: value, middle: middle, left: left, right: right},
-         {first_char, rest} = key
-       ) do
+        %TST{value: value, middle: middle, left: left, right: right},
+        {first_char, rest} = key
+      ) do
     cond do
       value == first_char -> find_node(middle, String.next_grapheme(rest))
       value > first_char -> find_node(left, key)
@@ -211,11 +209,14 @@ defmodule TST do
   @spec get_item(%TST{}, String.t()) :: {:ok | :error, any}
   def get_item(tst, key) do
     case find_node(tst, key) do
-      {:ok, subtree} -> case not is_nil(subtree.item) do
-                                           true  -> {:ok, subtree.item}
-                                           false -> {:error, "Key was not valid"}
-                                         end
-      {:error, _} -> {:error, "The key was not valid"}
+      {:ok, subtree} ->
+        case not is_nil(subtree.item) do
+          true -> {:ok, subtree.item}
+          false -> {:error, "Key was not valid"}
+        end
+
+      {:error, _} ->
+        {:error, "The key was not valid"}
     end
   end
 
@@ -228,7 +229,6 @@ defmodule TST do
       {:error, _} -> {:error, "The key was not valid"}
     end
   end
-
 
   ####################################################################################################
   # Here comes the all entries with prefix function
@@ -253,19 +253,18 @@ defmodule TST do
   defp prefix_collector(%TST{value: value, item: item} = tst, key) when is_nil(item) do
     # Not a hit on this one, we send the call further
     prefix_collector(tst.left, key) ++
-    prefix_collector(tst.middle, key <> value) ++
-    prefix_collector(tst.right, key)
+      prefix_collector(tst.middle, key <> value) ++
+      prefix_collector(tst.right, key)
   end
 
   defp prefix_collector(%TST{value: value, item: item} = tst, key)
-    when not is_nil(item) do
-      # We've hit a node with an valid item
-      prefix_collector(tst.left, key) ++
+       when not is_nil(item) do
+    # We've hit a node with an valid item
+    prefix_collector(tst.left, key) ++
       [key <> value] ++
       prefix_collector(tst.middle, key) ++
       prefix_collector(tst.right, key)
   end
-
 
   ####################################################################################################
   # Here comes helper functions

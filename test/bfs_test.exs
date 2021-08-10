@@ -1,8 +1,6 @@
-
 defmodule BFSTest do
   use ExUnit.Case
   doctest Graph.BFS
-
 
   test "BFS finds identifies all three vertices in graph with three vertices" do
     # Arrange
@@ -34,7 +32,6 @@ defmodule BFSTest do
     assert {0, 1} in result
   end
 
-
   test "BFS finds self loop in a component with reflexive properties" do
     graph = Graph.new(3) |> Graph.add_edge(0, 1) |> Graph.add_edge(0, 0)
 
@@ -44,7 +41,6 @@ defmodule BFSTest do
     assert {0, 1} in result
     assert {0, 0} in result
   end
-
 
   test "can query graph to see if two vertices that are connected if they are connected" do
     graph = Graph.new(2) |> Graph.add_edge(0, 1)
@@ -70,7 +66,6 @@ defmodule BFSTest do
     assert result == true
   end
 
-
   test "query nil graph to see if two vertices are connected" do
     graph = nil
 
@@ -87,13 +82,11 @@ defmodule BFSTest do
     assert result == false
   end
 
- test "query graph connectedness negative vertices that are not in graph" do
+  test "query graph connectedness negative vertices that are not in graph" do
     graph = Graph.new(2)
 
     result = Graph.BFS.is_connected(graph, -2, -3)
 
     assert result == false
   end
-
-
 end
