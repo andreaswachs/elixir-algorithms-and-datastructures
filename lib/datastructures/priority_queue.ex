@@ -61,11 +61,10 @@ defmodule PriorityQueue do
     |> then(&swim(&1, get_size(&1)))
   end
 
-
   defp swim(pq, index) do
     case index > 1 and maintains_heap_ordering(pq, div(index, 2), index) do
       true -> exchange(pq, div(index, 2), index) |> swim(div(index, 2))
-      false -> pq
+      false -> pq |> IO.inspect(label: "Swim returned the pq with maintains_heap_ordering() = #{maintains_heap_ordering(pq, div(index, 2), index)} and index = #{index} and next index = #{div(index, 2)}")
     end
   end
 
@@ -85,10 +84,10 @@ defmodule PriorityQueue do
     |> then(fn meta_data -> meta_data.fun end)
   end
 
-  defp maintains_heap_ordering(pq, next, current) do
-    heap_order_functon(pq).(elem(pq, next), elem(pq, current))
+  def maintains_heap_ordering(pq, next, current) do
+    result = heap_order_functon(pq).(elem(pq, next), elem(pq, current))
+    result
   end
-
 
   defp exchange(pq, this, that) do
     {elem(pq, this), elem(pq, that)}
@@ -100,11 +99,9 @@ defmodule PriorityQueue do
     |> put_elem(that, this_item)
   end
 
-
   ##################################################################################################
   # Here comes functions for dequeueing
   ##################################################################################################
-
 
   @doc """
   Dequeue the item with the highest priority. This means that for maximum oriented heaps, the largest item
@@ -119,23 +116,49 @@ defmodule PriorityQueue do
 
   def dequeue(pq) do
     case get_size(pq) do
-      0 -> {:error, "Queue is empty"}
-      size -> exchange(pq, 1, size)
-      |> sink()
-      |> Tuple.delete_at(size)
-      |> then(fn new_pq -> put_elem(new_pq, 0, %{elem(new_pq, 0) | size: size - 1}) end)
-      |> then(fn new_pq -> {:ok, new_pq, elem(pq, 1)} end)
+      0 ->
+        {:error, "Queue is empty"}
+
+      size ->
+        exchange(pq, 1, size)
+        |> then(fn pq -> {pq, elem(pq, size)} end)
+        |> then(fn {pq, value} -> {Tuple.delete_at(pq, size), value} end)
+        |> then(fn {pq, value} -> {decrease_size(pq), value} end)
+        |> then(fn {pq, value} -> {sink(pq), value} end)
+        |> then(fn {new_pq, value} -> {:ok, new_pq, value} end)
+    end
+  end
+
+  defp decrease_size(pq) do
+    put_elem(pq, 0, %{elem(pq, 0) | size: get_size(pq) - 1})
+  end
+
+  defp determine_element_to_swim(pq, i, j) do
+    # Determine which index to swim towards
+    # This compares the two indexes, which should
+    # be children of the same parent
+    case maintains_heap_ordering(pq, i, j) do
+      true -> j
+      false -> i
     end
   end
 
   def sink(pq, index \\ 1) do
     case (j = 2 * index) <= (n = get_size(pq)) do
-      true -> cond do
-                j < n and maintains_heap_ordering(pq, j, index) -> pq |> tap(IO.puts("sinking to the right")) |> tap(IO.inspect(pq))|> sink(j + 1)
-                not maintains_heap_ordering(pq, j, index) -> pq
-                true -> exchange(pq, j, index)
-              end
-      false -> pq
+      true ->
+        case j == n do
+          false ->
+            determine_element_to_swim(pq, j, j + 1)
+            |> then(fn next -> {exchange(pq, index, next), next} end)
+            |> then(fn {new_pq, next} -> sink(new_pq, next) end)
+          true -> # j < n
+            case maintains_heap_ordering(pq, j, index) do
+              true -> pq
+              false -> exchange(pq, j, index) |> swim(j)
+            end
+        end
+      false ->
+        pq
     end
   end
 end

@@ -39,13 +39,32 @@ defmodule PriorityQueueTest do
 
     {:ok, new_pq, val} = PriorityQueue.dequeue(queue)
     assert val == 1
-    IO.inspect(new_pq)
 
     {:ok, new_pq, val} = PriorityQueue.dequeue(new_pq)
     assert val == 2
 
     {:ok, _, val} = PriorityQueue.dequeue(new_pq)
     assert val == 3
+  end
+
+
+  test "max oriented priority queue returns all values in correct order with many values" do
+    queue =
+      Enum.reduce(Range.new(1, 100), PriorityQueue.new_maxpq, fn x, acc ->
+        PriorityQueue.insert(acc, x)
+      end)
+
+      IO.inspect(queue, label: "Queue after insertion of 1..100")
+
+      Enum.reduce(Range.new(100, 1), queue, fn x, acc ->
+        {:ok, new_pq, val} = PriorityQueue.dequeue(acc)
+        assert x == val
+        new_pq
+      end)
+  end
+
+  test "min oriented priority queue retusn all values in correct order with many values" do
+    assert true
   end
 
 end
